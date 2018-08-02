@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>
+    {{user['username']}}@FastCards
+</h2>
+<h3>Here are your Decks</h3>
+{% for deckname in decks %} 
+
+<p> {{ deckname }} <a href="{{ url_for('entry') }}">add cards</a> </p>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %} 
+{% block content %}
+<h1>Enter Cards
+    <h2>
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.term.label }} {{ form.term(size=32) }} {% for error in form.term.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.definition.label }} {{ form.definition(size=32)}} {% for error in form.definition.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+
+        </form>
+
+        {% endblock %}
