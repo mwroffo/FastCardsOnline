@@ -8,7 +8,6 @@ import tempfile
 
 from app import app
 
-
 class BasicTestCase(unittest.TestCase):
     def test_index(self):
         tester = app.test_client(self)

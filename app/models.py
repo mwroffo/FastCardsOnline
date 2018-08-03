@@ -1,4 +1,7 @@
-from app.app import db
+""" defines database tables 
+mwroffo 2018-08-02 """
+
+from app import db
 
 class User(db.Model):
     """ declares the SQL schema for a users table.
