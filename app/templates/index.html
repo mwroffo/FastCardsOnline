@@ -2,12 +2,12 @@
 
 {% block content %}
 <h2>
-    {{user['username']}}@FastCards
+    Welcome, {{ user['username'] }}, to FastCards.
 </h2>
-<h3>Here are your Decks</h3>
-{% for deckname in decks %} 
+<h3>{{user['username']}}'s Decks</h3>
 
-<p> {{ deckname }} <a href="{{ url_for('entry') }}">add cards</a> </p>
+{% for deckname in decks %}
+<p> {{ deckname }} <a href="{{ url_for('review') }}">review</a> &nbsp; <a href="{{ url_for('browse_edit') }}"> browse/edit</a> </p>
 {% endfor %}
 
 {% endblock %}
