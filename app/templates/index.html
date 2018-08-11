@@ -1,13 +1,19 @@
 {% extends "base.html" %}
-
 {% block content %}
 <h2>
     Welcome, {{ user['username'] }}, to FastCards.
 </h2>
 <h3>{{user['username']}}'s Decks</h3>
 
-{% for deckname in decks %}
-<p> {{ deckname }} <a href="{{ url_for('review') }}">review</a> &nbsp; <a href="{{ url_for('browse_edit') }}"> browse/edit</a> </p>
-{% endfor %}
+BUTTON GOES HERE: CREATE NEW DECK renders an empty browse_edit
+
+<form action="" method="post" novalidate>
+    {% for deckname, deckform in decks_form.items() %}
+
+    <p>
+        {{ deckform.deckname }} &nbsp; {{ deckform.review() }} &nbsp; {{ deckform.browse_edit() }}
+    </p>
+    {% endfor %}
+</form>
 
 {% endblock %}

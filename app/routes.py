@@ -1,23 +1,28 @@
 from app.DecksModel import DecksModel
 from flask import render_template, flash, redirect, url_for
-from app import app
-from app.forms import LoginForm, EntryForm
+from app import app, db, decksmodel
+from app.forms import LoginForm, BrowseEditForm, DeckForm, DecksForm, CardForm
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
+    SelectField, FormField, FieldList
+from wtforms.validators import DataRequired
 
 @app.route('/')  # these @ things are called decorators in python.
 @app.route('/index')
 def index():
-    user = {'username': 'mwroffo'}
-    # render_template takes as args: the template file, and any objects
-    # that are necessary for dynamic content
-    # TODO this should prob be done with url_for()
-    mwroffo = DecksModel('/Users/_mexus/Documents/code/fastcardsonline/mwroffo')
-    decks = mwroffo.getDecks()
+    decks_form = {}
+    class _DeckForm(DeckForm):
+        """ inherits the review and submit buttons from DeckForm """
+        pass
+    for deckmodel in decksmodel.getDecks().values():
+        setattr(_DeckForm, 'deckname', deckmodel.getTablename())
+        decks_form[deckmodel.getTablename()] = _DeckForm()
+    
     return render_template(
         'index.html',
         title='Home',
-        user=user,
-        decks=decks.keys())
-
+        user={'username': 'mwroffo'},
+        decks_form=decks_form) # submit a list of forms?
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -32,14 +37,15 @@ def login():
 
 @app.route('/browse_edit', methods=['GET', 'POST'])
 def browse_edit():
-    form = EntryForm()
+    form = BrowseEditForm(DECK) # TODO pass a DeckModel object as parameter. index form should submit a deckname. pass as parameter that deckname's corresponding DeckModel.
     if form.validate_on_submit():
         flash('Card saved: term={}, definition={}'.format(
             form.term.data, form.definition.data))
         return redirect(url_for('browse_edit.html'))
-    return render_template('browse_edit.html', title='Enter a card',  user={'username': 'mwroffo'}, form=form)
+    return render_template('browse_edit.html', title='Enter a card',  \
+        user={'username': 'mwroffo'}, form=form)
 
 @app.route('/review', methods=['GET', 'POST'])
 def review():
-    form = EntryForm() # TODO 2018-08-05 change from placeholder to ReviewForm()
+    form = BrowseEditForm(decks) # TODO 2018-08-05 change from placeholder to ReviewForm()
     return render_template('review.html', title='Reviewing deck', form=form, user={'username': 'mwroffo'})

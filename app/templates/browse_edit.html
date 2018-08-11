@@ -3,6 +3,8 @@
 <h2>{{ form.selectedDeck.label }} {{ form.selectedDeck() }} </h2>
         <form action="" method="post" novalidate>
             {{ form.hidden_tag() }}
+
+            {% for card in form.getDeckModel() %}
             <p>
                 {{ form.term.label }} {{ form.term(size=32) }} 
                 {% for error in form.term.errors %}
@@ -10,12 +12,13 @@
                 {% endfor %}
             </p>
             <p>
-                {{ form.definition.label }} {{ form.definition(size=32)}}
+                {{ form.definition.label }} {{ form.definition(size=32) }}
                 {% for error in form.definition.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
+            {% endfor %}
+
             <p>{{ form.submit() }}</p>
         </form>
 {% endblock %}
-
