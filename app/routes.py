@@ -15,8 +15,9 @@ def index():
         """ inherits the review and submit buttons from DeckForm """
         pass
     for deckmodel in decksmodel.getDecks().values():
-        setattr(_DeckForm, 'deckname', deckmodel.getTablename())
-        decks_form[deckmodel.getTablename()] = _DeckForm()
+        new_deckform = _DeckForm()
+        setattr(new_deckform, 'deckname', deckmodel.getTablename())
+        decks_form[deckmodel.getTablename()] = new_deckform
     
     return render_template(
         'index.html',
