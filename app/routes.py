@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired
 @app.route('/')  # these @ things are called decorators in python.
 @app.route('/index')
 def index():
-    decks_form = {}
+    decks_form = {} # Not actually a Form object. Do not be confused.
     class _DeckForm(DeckForm):
         """ inherits the review and submit buttons from DeckForm """
         pass
@@ -18,7 +18,6 @@ def index():
         new_deckform = _DeckForm()
         setattr(new_deckform, 'deckname', deckmodel.getTablename())
         decks_form[deckmodel.getTablename()] = new_deckform
-    
     return render_template(
         'index.html',
         title='Home',
