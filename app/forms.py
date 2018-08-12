@@ -42,5 +42,5 @@ class BrowseEditForm(FlaskForm):
     # empty field goes at bottom to invite new card entries.
     entry_row = FormField(CardForm)
     # submit makes the changes in the deck, a table in the database.
-    submit = SubmitField('Add card to deck')
+    add_card = SubmitField('+')
     review = SubmitField('Review this Deck') # sends request.form['deckname'] to inform load the proper review page.

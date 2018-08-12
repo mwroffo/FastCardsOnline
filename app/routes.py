@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, Request
 from app import app, decksmodel
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
 from flask_wtf import FlaskForm
@@ -22,17 +22,20 @@ def login():
 def index():
     decks_form = {} # Not actually a Form object. Do not be confused.
     class _DeckForm(DeckForm):
-        """ inherits the review and submit buttons from DeckForm """
-        pass
+            pass
     for deckmodel in decksmodel.getDecks().values():
         # Field edits must be made on the class to avoid UnboundField error.
         setattr(_DeckForm, 'browse_edit', SubmitField('Browse/Edit'))
-        new_deckform = _DeckForm() # but simple string attributes can be edited on instances:
+        # deckname as StringField so that it can be submitted:
+        setattr(_DeckForm, 'deckname', StringField(label='deckname', default=deckmodel.getTablename()))
+        new_deckform = _DeckForm()
+        # deckname as str attribute so that it can be printed to the view:
         setattr(new_deckform, 'deckname', deckmodel.getTablename())
         decks_form[deckmodel.getTablename()] = new_deckform
+    
     setattr(_DeckForm, 'browse_edit', SubmitField('Create a New Empty Deck'))
+    setattr(_DeckForm, 'deckname', StringField(label='deckname', default=''))
     empty_deckform = _DeckForm()
-    setattr(empty_deckform, 'deckname', '')
     return render_template(
         'index.html',
         title='Home',
@@ -50,31 +53,39 @@ def browse_edit():
     # if user is editing a preexisting deck, render the deckname field, all cards as term, definition, a term/def row for new entries, a "return to decks" button, and a "review this deck" button
     
     if request.method == 'POST':
-        if request.form['deckname'] == '':
+        class _BrowseEditForm(BrowseEditForm):
             pass
-        else:
-            class _BrowseEditForm(BrowseEditForm):
-                pass
 
-            # set decktitle field to the deck's name:
-            deckname = request.form['deckname']
-            deckmodel = decksmodel.getDecks()[deckname]
-            _BrowseEditForm.deckname.default = deckname
-            browse_edit_form = _BrowseEditForm()
-            class _CardForm(CardForm):
-                pass     
-            
-            for card in deckmodel.getCards():
-                _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
-                _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
-                browse_edit_form.cards.append_entry(_CardForm())
-            # for empty decks, `cards` will not render.
+        # set decktitle field to the deck's name:
+        print('\n', 'request.form contains: ', str(request.form), '\n')
+        # yields: request.form contains:  ImmutableMultiDict([('browse_edit', 'Browse/Edit')])
+        deckname = request.form.get('deckname')
+        deckmodel = decksmodel.getDecks()[deckname]
+        _BrowseEditForm.deckname.default = deckname
+        browse_edit_form = _BrowseEditForm()
+        class _CardForm(CardForm):
+            pass
+        
+        for card in deckmodel.getCards():
+            _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
+            _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
+            browse_edit_form.cards.append_entry(_CardForm())
+        # for empty decks, `cards` will not render.
     else:
         error = 'invalid form'
     if browse_edit_form.validate_on_submit:
         return render_template('browse_edit.html', title='Enter a card',  \
-            user={'username': 'mwroffo'}, browse_edit_form=browse_edit_form, error=error)
+            user={'username': 'mwroffo'}, form=browse_edit_form, error=error)
     return redirect(url_for('browse_edit.html'))
+
+@Request.application
+def respond_deck(request, deckname):
+    """ Handles a request to render an already existing deck in browse/edit view """
+
+
+@Request.application
+def respond_empty_deck(request):
+    """ Handles a request to render an empty browse/edit page """
 
 @app.route('/review', methods=['GET', 'POST'])
 def review():

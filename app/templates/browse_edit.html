@@ -1,24 +1,26 @@
 {% extends "base.html" %} 
 {% block content %}
-<h2>{{ form.selectedDeck.label }} {{ form.selectedDeck() }} </h2>
+<h2>{{ form.deckname }} </h2>
         <form action="" method="post" novalidate>
             {{ form.hidden_tag() }}
 
-            {% for card in form.getDeckModel() %}
+            {% for cardform in form.cards %}
             <p>
-                {{ form.term.label }} {{ form.term(size=32) }} 
-                {% for error in form.term.errors %}
+                {{ cardform.term.label }} {{ cardform.term(size=32) }} 
+                {% for error in cardform.term.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
             <p>
-                {{ form.definition.label }} {{ form.definition(size=32) }}
-                {% for error in form.definition.errors %}
+                {{ cardform.definition.label }} {{ cardform.definition(size=32) }}
+                {% for error in cardform.definition.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
             {% endfor %}
 
-            <p>{{ form.submit() }}</p>
+            <p>{{ form.entry_row() }}</p>
+            <p>{{ form.add_card() }}</p>
+            <p>{{ form.review() }}</p>
         </form>
 {% endblock %}
