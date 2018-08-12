@@ -1,6 +1,3 @@
-from app import decksmodel # import the application superglobal decksmodel
-from app.DecksModel import DecksModel
-from app.DeckModel import DeckModel
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     SelectField, FormField, FieldList
@@ -23,7 +20,6 @@ class DeckForm(FlaskForm):
     `DeckForm` is passed to `FormField` in `DecksForm`.
     """
     review = SubmitField('Review')
-    # browse_edit = SubmitField('Browse/Edit')
 
 class CardForm(FlaskForm):
     """
@@ -33,26 +29,18 @@ class CardForm(FlaskForm):
     passing a term and definition (or `Card` object?) inits these fields
     with their current values in database.
     """
-    term = StringField('Term', validators=[DataRequired()], default='enter a term')
-    definition = StringField('Definition', validators=[DataRequired()], default='enter a definition')
-
-class CardsForm(FlaskForm):
-    """
-    `CardsForm` uses `CardForm`s to dynamically render a Deck in rows,
-    with cards displayed as mutable textfields.
-    """
-    # TODO
+    term = StringField(label='Term', validators=[DataRequired()], default='Enter a new term')
+    definition = StringField(label='Definition', validators=[DataRequired()], default='Enter a new definition')
 
 class BrowseEditForm(FlaskForm):
-    """ Represents a Deck as a series of `CardForm`s. """
-    # populate StringField deckname with the current deckname:
-    deckname = StringField('deckname', validators=[DataRequired()])
-    cards = FormField(CardsForm)
-    entry_row = FormField(CardForm) # empty field goes at bottom to invite new card entries.
-    submit = SubmitField('Add card to deck') # submit makes the changes in the deck, a table in the database.
-
-    def __init__(self, deckmodel):
-        """ takes a `DeckModel` as argument and creates a BrowseEditForm """
-        self._deck = deckmodel
-    def getDeckModel(self):
-        return self._deck
+    """
+    `BrowseEditForm` uses `CardForm`s to dynamically render a Deck in rows,
+    with cards displayed as mutable textfields.
+    """
+    deckname = StringField('Enter a name for this Deck: ', validators=[DataRequired()])
+    cards = FieldList(FormField(CardForm), min_entries=1)
+    # empty field goes at bottom to invite new card entries.
+    entry_row = FormField(CardForm)
+    # submit makes the changes in the deck, a table in the database.
+    submit = SubmitField('Add card to deck')
+    review = SubmitField('Review this Deck') # sends request.form['deckname'] to inform load the proper review page.

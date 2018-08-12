@@ -1,6 +1,5 @@
-from app.DecksModel import DecksModel
 from flask import render_template, flash, redirect, url_for, request
-from app import app, db, decksmodel
+from app import app, decksmodel
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
@@ -43,17 +42,39 @@ def index():
 
 @app.route('/browse_edit', methods=['GET', 'POST'])
 def browse_edit():
+    """
+    Renders a browse/edit view of a certain deck.
+    TODO does this also handle adding to the deck, or just rendering it?
+    """
     # if user is creating a new empty deck, render only the deckname field with newtermfield and newdeffield
-    # if user is editing a preexisting deck, render the deckname field, <all cards as term, definition, 
-    # if request.form['deckname'] == '':
-        # pass
-    form = BrowseEditForm(DECK) # TODO pass a DeckModel object as parameter. index form should submit a deckname. pass as parameter that deckname's corresponding DeckModel.
-    if form.validate_on_submit():
-        flash('Card saved: term={}, definition={}'.format(
-            form.term.data, form.definition.data))
-        return redirect(url_for('browse_edit.html'))
-    return render_template('browse_edit.html', title='Enter a card',  \
-        user={'username': 'mwroffo'}, form=form)
+    # if user is editing a preexisting deck, render the deckname field, all cards as term, definition, a term/def row for new entries, a "return to decks" button, and a "review this deck" button
+    
+    if request.method == 'POST':
+        if request.form['deckname'] == '':
+            pass
+        else:
+            class _BrowseEditForm(BrowseEditForm):
+                pass
+
+            # set decktitle field to the deck's name:
+            deckname = request.form['deckname']
+            deckmodel = decksmodel.getDecks()[deckname]
+            _BrowseEditForm.deckname.default = deckname
+            browse_edit_form = _BrowseEditForm()
+            class _CardForm(CardForm):
+                pass     
+            
+            for card in deckmodel.getCards():
+                _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
+                _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
+                browse_edit_form.cards.append_entry(_CardForm())
+            # for empty decks, `cards` will not render.
+    else:
+        error = 'invalid form'
+    if browse_edit_form.validate_on_submit:
+        return render_template('browse_edit.html', title='Enter a card',  \
+            user={'username': 'mwroffo'}, browse_edit_form=browse_edit_form, error=error)
+    return redirect(url_for('browse_edit.html'))
 
 @app.route('/review', methods=['GET', 'POST'])
 def review():

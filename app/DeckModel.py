@@ -1,11 +1,17 @@
 import sqlite3
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, ForeignKey
 from sqlalchemy.sql import select
+from app import session
 
 class DeckModel:
     """
     encapsulates sqlalchemy methods and represents a 
-    connection to a particular `Deck`
+    connection to a particular `Deck`, which is represented by
+    a single table.
+
+    db.Model is not extended because the database design
+    demands multiple tables of identical schema.
+    ??? Can model objects be instantiated multiple times with different tables of identical schema? ???
     """
     def __init__(self, tablename, username):
         self._tablename, self._username = tablename, username
@@ -19,6 +25,12 @@ class DeckModel:
                                 )
         self._metadata.create_all(self._engine)
 
+    def getCards(self):
+        """
+        Returns the `list` resulting from `session.query(self._table).all()`
+        """
+        return session.query(self._table).all()
+    
     def addCard(self, term, definition):
         """ add a new card to the deck. DO NOT allow duplicate terms. """
         ins = self._table.insert().values(term=term, definition=definition)
