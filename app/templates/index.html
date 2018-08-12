@@ -3,9 +3,9 @@
 <h2>
     Welcome, {{ user['username'] }}, to FastCards.
 </h2>
-<h3>{{user['username']}}'s Decks &nbsp; <button>Or, CREATE new empty deck</button></h3>
+<h3>{{user['username']}}'s Decks <form action="/browse_edit" method="post" novalidate> {{ empty_deckform.browse_edit()  }} </form></h3>
 
-<form action="" method="post" novalidate>
+<form action="/browse_edit" method="post" novalidate>
     {% for deckname, deckform in decks_form.items() %}
 
     <p>

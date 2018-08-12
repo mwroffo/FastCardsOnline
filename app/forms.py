@@ -23,19 +23,7 @@ class DeckForm(FlaskForm):
     `DeckForm` is passed to `FormField` in `DecksForm`.
     """
     review = SubmitField('Review')
-    browse_edit = SubmitField('Browse/Edit')
-    
-class DecksForm(FlaskForm):
-    """
-    DecksForm helps render index.html. DecksForm populates itself
-    with DeckForm rows with help from the global `decksmodel`.
-
-    self._rows is a dict of all deckname:deckforms in the database.
-    """
-    rows = {}
-    # for deckname, deckmodel in decksmodel._decks.items():
-        # rows[deckname] = FieldList(FormField(DeckForm))
-    
+    # browse_edit = SubmitField('Browse/Edit')
 
 class CardForm(FlaskForm):
     """
@@ -45,8 +33,8 @@ class CardForm(FlaskForm):
     passing a term and definition (or `Card` object?) inits these fields
     with their current values in database.
     """
-    term = StringField('Term', validators=[DataRequired()])
-    definition = StringField('Definition', validators=[DataRequired()])
+    term = StringField('Term', validators=[DataRequired()], default='enter a term')
+    definition = StringField('Definition', validators=[DataRequired()], default='enter a definition')
 
 class CardsForm(FlaskForm):
     """
