@@ -1,0 +1,4 @@
+{
+  "test_fastcards.py::test_request": true,
+  "tests/test_fastcards.py::test_request": true
+}
