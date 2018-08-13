@@ -3,15 +3,16 @@
 <h2>
     Welcome, {{ user['username'] }}, to FastCards.
 </h2>
-<h3>{{user['username']}}'s Decks <form action="/browse_edit" method="post" novalidate> {{ empty_deckform.browse_edit()  }} </form></h3>
-
+<h3>{{user['username']}}'s Decks
+    <form action="/browse_edit" method="post" novalidate> {{ empty_deckform.browse_edit() }} </form>
+</h3>
+{% for deckname, deckform in decks_form.items() %}
 <form action="/browse_edit" method="post" novalidate>
-    {% for deckname, deckform in decks_form.items() %}
-
+    {{ deckform.deckname_field }}
     <p>
         {{ deckform.deckname }} &nbsp; {{ deckform.review() }} &nbsp; {{ deckform.browse_edit() }}
     </p>
-    {% endfor %}
 </form>
+{% endfor %}
 
 {% endblock %}

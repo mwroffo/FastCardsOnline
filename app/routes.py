@@ -3,7 +3,7 @@ from app import app, decksmodel
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, FormField, FieldList
+    SelectField, FormField, FieldList, HiddenField
 from wtforms.validators import DataRequired
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -12,9 +12,10 @@ def login():
     # if fields are empty, DataRequired argument in LoginField will make this false,
     # forcing the form to simply reload, until it is completed correctly. bomb.com.
     if form.validate_on_submit():  # false when serving the form, true when submitting the form
+        print('\n', 'LOGIN FORM SAYS: ', request.form, '\n')
         flash('Login request: username={}, remember_me={}'.format(
             form.username.data, form.remember_me.data))
-        return redirect(url_for('index.html'))
+        return redirect(url_for('index'))
     return render_template('login.html', title='Sign In to FastCards', form=form, user={'username': 'mwroffo'})
 
 @app.route('/')  # these @ things are called decorators in python.
@@ -27,14 +28,14 @@ def index():
         # Field edits must be made on the class to avoid UnboundField error.
         setattr(_DeckForm, 'browse_edit', SubmitField('Browse/Edit'))
         # deckname as StringField so that it can be submitted:
-        setattr(_DeckForm, 'deckname', StringField(label='deckname', default=deckmodel.getTablename()))
+        setattr(_DeckForm, 'deckname_field', HiddenField(label='deckname', default=deckmodel.getTablename()))
         new_deckform = _DeckForm()
         # deckname as str attribute so that it can be printed to the view:
         setattr(new_deckform, 'deckname', deckmodel.getTablename())
         decks_form[deckmodel.getTablename()] = new_deckform
     
     setattr(_DeckForm, 'browse_edit', SubmitField('Create a New Empty Deck'))
-    setattr(_DeckForm, 'deckname', StringField(label='deckname', default=''))
+    setattr(_DeckForm, 'deckname_field', HiddenField(label='deckname', default=''))
     empty_deckform = _DeckForm()
     return render_template(
         'index.html',
@@ -57,25 +58,22 @@ def browse_edit():
             pass
 
         # set decktitle field to the deck's name:
-        print('\n', 'request.form contains: ', str(request.form), '\n')
-        # yields: request.form contains:  ImmutableMultiDict([('browse_edit', 'Browse/Edit')])
-        deckname = request.form.get('deckname')
+        deckname = request.form['deckname_field']
         deckmodel = decksmodel.getDecks()[deckname]
         _BrowseEditForm.deckname.default = deckname
         browse_edit_form = _BrowseEditForm()
         class _CardForm(CardForm):
             pass
         
+        print('deckmodel.getCards() is ', deckmodel.getCards())
         for card in deckmodel.getCards():
             _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
             _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
             browse_edit_form.cards.append_entry(_CardForm())
         # for empty decks, `cards` will not render.
-    else:
-        error = 'invalid form'
     if browse_edit_form.validate_on_submit:
         return render_template('browse_edit.html', title='Enter a card',  \
-            user={'username': 'mwroffo'}, form=browse_edit_form, error=error)
+            user={'username': 'mwroffo'}, form=browse_edit_form)
     return redirect(url_for('browse_edit.html'))
 
 @Request.application
