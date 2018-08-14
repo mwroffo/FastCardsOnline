@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy, SQLAlchemy.create_engine, SQLAlchemy.sessionmaker
-from flask_migrate import Migrate
+import flask_migrate
 from config import Config
 from contextlib import contextmanager
 import sqlite3
@@ -8,15 +8,17 @@ import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 
-def get_SQLAlchemy():
-    return SQLAlchemy(current_app)
+def init_SQLAlchemy():
+    """ loads sqlalchemy(app) into g.sql_alchemy """
+    g.sql_alchemy = SQLAlchemy(current_app)
 
 @contextmanager
 def get_db():
-    """ Returns a SQLAlchemy session instance """
+    """ yields a SQLAlchemy session instance, associated with current_app """
     if 'db' not in g:
-        engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-        Session = sessionmaker(bind=engine)
+        init_SQLAlchemy()
+        # .session is Flask-SQLAlchemy's preconfigured session factory:
+        Session = g.sql_alchemy.session
         g.db = Session()
     try:
         yield g.db
@@ -28,17 +30,25 @@ def get_db():
         close_db()
 
 def close_db(e=None):
+    """ Flask-SQLAlchemy actually closes sessions automatically
+    but I am including this for personal sanity. """
     db = g.pop('db', None)
     if db is not None:
         db.close()
 
 def init_db():
+    """ uses Migrate to init database. gets a session from get_db() """
     db = get_db()
     g.migrate = get_migrate()
-    # TODO use migrate to init tables in models.py
+    flask_migrate.init() # informed by models.py
+    flask_migrate.migrate()
+    flask_migrate.upgrade()
 
-def get_migrate():
-    g.migrate = Migrate(current_app, get_SQLAlchemy())
+def init_migrate():
+    """ puts a Migrate(current_app, g.sql_alchemy) object into g.migrate """
+    if 'sql_alchemy' not in g:
+        init_SQLAlchemy() # ensures that db was initialized first
+    g.migrate = flask_migrate.Migrate(current_app, g.sql_alchemy)
 
 @click.command('init-db')
 @with_appcontext
@@ -49,7 +59,7 @@ def init_db_command():
 
 def init_app(app):
     """
-    Performs essential setup tasks.
+    Registers teardown_context and adds cli commands. —mwroffo
     """
     app.teardown_appcontext(close_db)    # now flask will run close_db() after returning responses.
-    app.cli.add_command(init_db_command) # now you can say: flask init-db
+    app.cli.add_command(init_db_command) # now you can say: flask init-db, from shell.
