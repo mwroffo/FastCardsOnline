@@ -1,14 +1,14 @@
-from flask import render_template, flash, redirect, url_for,\
-    request, Request, current_app, g
+from flask import render_template, flash, redirect, url_for, request
+from app.main import bp
 from app import decksmodel # TODO decksmodel like app needs to be abstracted into a callable context
-                                # LOL hows THAT for some jargon? 
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     SelectField, FormField, FieldList, HiddenField
 from wtforms.validators import DataRequired
 
-@current_app.route('/login', methods=['GET', 'POST'])
+
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     # if fields are empty, DataRequired argument in LoginField will make this false,
@@ -17,11 +17,11 @@ def login():
         print('\n', 'LOGIN FORM SAYS: ', request.form, '\n')
         flash('Login request: username={}, remember_me={}'.format(
             form.username.data, form.remember_me.data))
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     return render_template('login.html', title='Sign In to FastCards', form=form, user={'username': 'mwroffo'})
 
-@current_app.route('/')  # these @ things are called decorators in python.
-@current_app.route('/index')
+@bp.route('/')  # these @ things are called decorators in python.
+@bp.route('/index')
 def index():
     decks_form = {} # Not actually a Form object. Do not be confused.
     class _DeckForm(DeckForm):
@@ -46,7 +46,7 @@ def index():
         decks_form=decks_form, # submit dict of deckforms
         empty_deckform=empty_deckform) # requests from an empty deckform will indicate a new deck
 
-@current_app.route('/browse_edit', methods=['GET', 'POST'])
+@bp.route('/browse_edit', methods=['GET', 'POST'])
 def browse_edit():
     """
     Renders a browse/edit view of a certain deck.
@@ -78,16 +78,7 @@ def browse_edit():
             user={'username': 'mwroffo'}, form=browse_edit_form)
     return redirect(url_for('browse_edit.html'))
 
-@Request.application
-def respond_deck(request, deckname):
-    """ Handles a request to render an already existing deck in browse/edit view """
-
-
-@Request.application
-def respond_empty_deck(request):
-    """ Handles a request to render an empty browse/edit page """
-
-@current_app.route('/review', methods=['GET', 'POST'])
+@bp.route('/review', methods=['GET', 'POST'])
 def review():
     form = BrowseEditForm(decks) # TODO 2018-08-05 change from placeholder to ReviewForm()
     return render_template('review.html', title='Reviewing deck', form=form, user={'username': 'mwroffo'})

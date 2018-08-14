@@ -1,24 +1,18 @@
-from flask_sqlalchemy import SQLAlchemy
-import flask_migrate
 from config import Config
 from contextlib import contextmanager
 import sqlite3
+from app import db, migrate
+import flask_migrate
 
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 
-def init_SQLAlchemy():
-    """ loads sqlalchemy(app) into g.sql_alchemy """
-    g.sql_alchemy = SQLAlchemy(current_app)
-
 @contextmanager
 def get_db():
     """ yields a SQLAlchemy session instance, associated with current_app """
     if 'db' not in g:
-        init_SQLAlchemy()
-        # .session is Flask-SQLAlchemy's preconfigured session factory:
-        Session = g.sql_alchemy.session
+        Session = db.session
         g.db = Session()
     try:
         yield g.db
@@ -32,22 +26,15 @@ def get_db():
 def close_db(e=None):
     """ Flask-SQLAlchemy actually closes sessions automatically
     but I am including this for personal sanity. """
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
+    session = g.pop('db', None)
+    if session is not None:
+        session.close()
 
 def init_db():
     """ uses Migrate to init database. gets a session from get_db() """
-    init_migrate()
     flask_migrate.init() # informed by models.py
     flask_migrate.migrate()
     flask_migrate.upgrade()
-
-def init_migrate():
-    """ puts a Migrate(current_app, g.sql_alchemy) object into g.migrate """
-    if 'sql_alchemy' not in g:
-        init_SQLAlchemy() # ensures that db was initialized first
-    g.migrate = flask_migrate.Migrate(current_app, g.sql_alchemy)
 
 @click.command('init-db')
 @with_appcontext
