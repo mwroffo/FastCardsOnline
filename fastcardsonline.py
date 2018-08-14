@@ -1,6 +1,10 @@
-from app import app, db, migrate, decksmodel, session
-from app.models import User
+from app.models import User, Card
+from flask import current_app, g
+from app.db import db
 
-@app.shell_context_processor
+@current_app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'migrate': migrate, 'decksmodel': decksmodel, 'session': session}
+    session = db.get_db()
+    db.init_migrate()
+    return {'db': session, 'User': User, 'migrate': g.migrate,
+        'decksmodel': decksmodel}
