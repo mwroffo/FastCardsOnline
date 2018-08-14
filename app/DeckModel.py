@@ -1,7 +1,8 @@
 import sqlite3
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, ForeignKey
 from sqlalchemy.sql import select
-from app import session
+from . import db # access the sessionmaker
+from flask import current_app, g
 
 class DeckModel:
     """
@@ -29,7 +30,8 @@ class DeckModel:
         """
         Returns the `list` resulting from `session.query(self._table).all()`
         """
-        return session.query(self._table).all()
+        with db.get_db() as session:
+            return session.query(self._table).all()
     
     def addCard(self, term, definition):
         """ add a new card to the deck. DO NOT allow duplicate terms. """
@@ -49,12 +51,6 @@ class DeckModel:
             else:
                 result_str += str(result_tup[i])
         return result_str
-
-        # for entry in result_tup:
-            # if entry != result_tup[len(result_tup) - 1]:
-                # result_str += str(entry) + ' ; '
-            # else: result_str += str(entry)
-        # return result_str
 
     def removeCardByTerm(self, term):
         """

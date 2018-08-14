@@ -1,11 +1,12 @@
 import os
 import tempfile
 import flask
-from app.forms import DeckForm
+import sys
+sys.path.insert(0 '/Users/_mexus/Documents/code/FastCardsOnline/app')
+import app.forms
 
-import pytest
-
-from app import app
+import pytest, os, flask, tempfile
+from flask import current_app, g
 
 @pytest.fixture
 def client():
@@ -23,6 +24,6 @@ def client():
     os.unlink(app.app.config['DATABASE'])
 
 def test_request(client):
-    app = flask.Flask(__name__)
+    current_app = flask.Flask(__name__)
     deck_form = DeckForm()
     # with app.test_request_context('/browse_edit', data=data)

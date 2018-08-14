@@ -1,17 +1,12 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from flask_migrate import Migrate
+import db
 
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-engine = create_engine('sqlite:////Users/_mexus/Documents/code/fastcardsonline/app.db')
-Session = sessionmaker(bind=engine)
-session = Session()
-migrate = Migrate(app, db)
+def create_app(test_config=None):
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(Config)
+    db.init_app(app) # configures app's teardown_context and cli
+    return app
 
 from app.DecksModel import DecksModel
 decksmodel = DecksModel(

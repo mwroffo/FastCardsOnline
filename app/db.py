@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy, SQLAlchemy.create_engine, SQLAlchemy.sessionmaker
+from flask_sqlalchemy import SQLAlchemy
 import flask_migrate
 from config import Config
 from contextlib import contextmanager
@@ -38,8 +38,7 @@ def close_db(e=None):
 
 def init_db():
     """ uses Migrate to init database. gets a session from get_db() """
-    db = get_db()
-    g.migrate = get_migrate()
+    init_migrate()
     flask_migrate.init() # informed by models.py
     flask_migrate.migrate()
     flask_migrate.upgrade()
