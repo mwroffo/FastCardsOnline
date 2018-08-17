@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>
-    Welcome, {{ user['username'] }}, to FastCards.
+    Welcome, {{ current_user.username }}, to FastCards.
 </h2>
-<h3>{{user['username']}}'s Decks
+<h3>{{current_user.username}}'s Decks
     <form action="/browse_edit" method="post" novalidate> {{ empty_deckform.browse_edit() }} </form>
 </h3>
 {% for deckname, deckform in decks_form.items() %}

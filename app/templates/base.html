@@ -2,7 +2,7 @@
 
 <head>
     {% if title %}
-    <title>{{ title }} - {{user['username']}}@FastCards</title>
+    <title>{{ title }} - {{ current_user.username }}@FastCards</title>
     {% else %}
     <title>Welcome to FastCards</title>
     {% endif %}
@@ -12,7 +12,11 @@
     <div>
         FastCards
         <a href="{{ url_for('main.index') }}">Home</a>
-        <a href="{{ url_for('main.login') }}">Login</a>
+        {% if current_user.is_anonymous %}
+        <a href="{{ url_for('auth.login') }}">Login</a>
+        {% else %}
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+        {% endif %}
     </div>
     <hr> {% with messages = get_flashed_messages() %} {% if messages %}
     <ul>

@@ -1,4 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
+from flask_login import current_user, login_user, login_required
+from app.models import User
 from app.main import bp
 from app import decksmodel # TODO decksmodel like app needs to be abstracted into a callable context
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
@@ -7,21 +9,9 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     SelectField, FormField, FieldList, HiddenField
 from wtforms.validators import DataRequired
 
-
-@bp.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    # if fields are empty, DataRequired argument in LoginField will make this false,
-    # forcing the form to simply reload, until it is completed correctly. bomb.com.
-    if form.validate_on_submit():  # false when serving the form, true when submitting the form
-        print('\n', 'LOGIN FORM SAYS: ', request.form, '\n')
-        flash('Login request: username={}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect(url_for('main.index'))
-    return render_template('login.html', title='Sign In to FastCards', form=form, user={'username': 'mwroffo'})
-
 @bp.route('/')  # these @ things are called decorators in python.
 @bp.route('/index')
+@login_required
 def index():
     decks_form = {} # Not actually a Form object. Do not be confused.
     class _DeckForm(DeckForm):
@@ -42,7 +32,6 @@ def index():
     return render_template(
         'index.html',
         title='Home',
-        user={'username': 'mwroffo'},
         decks_form=decks_form, # submit dict of deckforms
         empty_deckform=empty_deckform) # requests from an empty deckform will indicate a new deck
 
