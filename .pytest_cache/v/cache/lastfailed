@@ -1,4 +1,7 @@
 {
+  "test_fastcards.py::test_empty_db": true,
+  "test_fastcards.py::test_login_logout": true,
   "test_fastcards.py::test_request": true,
+  "tests/test_fastcards.py::test_home_page": true,
   "tests/test_fastcards.py::test_request": true
 }

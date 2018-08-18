@@ -1,3 +1,4 @@
 [
-  "tests/test_fastcards.py::test_request"
+  "tests/test_fastcards.py::test_login_redirect",
+  "tests/test_fastcards.py::test_login_200"
 ]
