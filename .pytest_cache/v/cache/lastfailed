@@ -3,6 +3,5 @@
   "test_fastcards.py::test_login_logout": true,
   "test_fastcards.py::test_request": true,
   "tests/test_fastcards.py::test_home_page": true,
-  "tests/test_fastcards.py::test_request": true,
-  "tests/test_fastcards.py::test_valid_login_logout": true
+  "tests/test_fastcards.py::test_request": true
 }

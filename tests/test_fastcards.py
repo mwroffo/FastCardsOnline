@@ -1,9 +1,7 @@
-import os, tempfile, pytest
+import pytest
 from app import create_app, db
 from config import TestingConfig, DevelopmentConfig
 from app.models import User, Card
-import flask, flask_login
-import pytest
 
 @pytest.fixture(scope='module')
 def test_client():
@@ -64,14 +62,14 @@ def test_valid_login_logout(test_client, init_db):
     THEN check that the response is valid
     """
     response = test_client.post('/login',
-        data=dict(username='billy', email='billy-bob@gmail.com', password='real_password'),
+        data=dict(username='billy', password='real_password', remember_me=False),
         follow_redirects=True)
+    assert b"Welcome, billy, to FastCards" in response.data
     '''
     WHEN client submits post request to /logout
     THEN check that the user was logged out.
     '''
-    # TODO logout returns 405 not allowed.
-    assert flask_login.current_user.is_authenticated == True
-    response = test_client.post('/logout', follow_redirects=True)
+    # TODO logout returns 405 not allowed:
+    response = test_client.get('/logout', follow_redirects=True)
     assert response.status_code == 200
-    assert b'New user? Create an account.' in response.data
+    assert b'New user?' in response.data
