@@ -2,7 +2,7 @@ import os, tempfile, pytest
 from app import create_app, db
 from config import TestingConfig, DevelopmentConfig
 from app.models import User, Card
-import flask
+import flask, flask_login
 import pytest
 
 @pytest.fixture(scope='module')
@@ -10,7 +10,7 @@ def test_client():
     """
     Initializes a client for a suite of functional tests for FastCards.
     """
-    app = create_app(DevelopmentConfig) # init the flask instance
+    app = create_app(TestingConfig) # init the flask instance
 
     # init werkzeug test client from flask instance. this will be used in functional tests.
     client = app.test_client()
@@ -41,16 +41,37 @@ def test_login_redirect(test_client):
     """
     GIVEN a Flask application
     WHEN the '/' page is requested via GET
-    THEN check that the response is a 302 redirect.
+    THEN check that the response is a 302 redirect to /login
     """
-    response = test_client.get('/')
-    assert response.status_code == 302
+    response = test_client.get('/', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Please log in to access this page." in response.data
 
 def test_login_200(test_client):
     """
     GIVEN a Flask app
-    WHEN the '/login' page is requested via GET
+    WHEN the '/login' page is requested directly via GET
     THEN check that the response is 200
     """
     response = test_client.get('/login')
     assert response.status_code == 200
+    assert b"Sign In" in response.data
+
+def test_valid_login_logout(test_client, init_db):
+    """
+    GIVEN a Flask app
+    WHEN a client submit a login request via POST
+    THEN check that the response is valid
+    """
+    response = test_client.post('/login',
+        data=dict(username='billy', email='billy-bob@gmail.com', password='real_password'),
+        follow_redirects=True)
+    '''
+    WHEN client submits post request to /logout
+    THEN check that the user was logged out.
+    '''
+    # TODO logout returns 405 not allowed.
+    assert flask_login.current_user.is_authenticated == True
+    response = test_client.post('/logout', follow_redirects=True)
+    assert response.status_code == 200
+    assert b'New user? Create an account.' in response.data

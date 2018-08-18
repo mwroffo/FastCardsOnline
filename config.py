@@ -17,8 +17,6 @@ class TestingConfig(BaseConfig):
 class DevelopmentConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
-    USERNAME = 'admin'
-    PASSWORD = 'password'
     WTF_CSRF_ENABLED = True
 
 class ProductionConfig(DevelopmentConfig):
