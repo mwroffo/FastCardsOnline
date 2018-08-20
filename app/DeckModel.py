@@ -7,8 +7,12 @@ from flask import current_app, g
 class DeckModel:
     """
     encapsulates sqlalchemy methods and represents a 
-    connection to a particular `Deck`, which is represented by
-    a single table.
+    connection to a particular `Deck`, which constitutes all rows in
+    cards that share the deck
+
+    SECURITY CONSIDERATIONS: remember to validate input.
+    Reject term and definition inputs that look like SQL commands, html tags, javascript, etc.
+    Write a testbench for security specifically.
 
     db.Model is not extended because the database design
     demands multiple tables of identical schema.
@@ -39,7 +43,7 @@ class DeckModel:
         self._con.execute(ins)
 
     def selectCard(self, rowid):
-        """ returns the row with `rowid`, columns delimited by ; """
+        """ Returns the row that has `rowid`, with columns delimited by semicolons """
         s = select([self._table])
         result_proxy = self._con.execute(s)
         tup_array = result_proxy.fetchall()
