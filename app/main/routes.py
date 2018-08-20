@@ -50,13 +50,14 @@ def browse_edit():
 
         # set decktitle field to the deck's name:
         deckname = request.form['deckname_field']
+        # TODO new db architecture causes changes in deckmodel/decksmodel,
+        # which will cause changes here.
         deckmodel = decksmodel.getDecks()[deckname]
         _BrowseEditForm.deckname.default = deckname
         browse_edit_form = _BrowseEditForm()
         class _CardForm(CardForm):
             pass
         
-        print('deckmodel.getCards() is ', deckmodel.getCards())
         for card in deckmodel.getCards():
             _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
             _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])

@@ -2,6 +2,9 @@
   "test_fastcards.py::test_empty_db": true,
   "test_fastcards.py::test_login_logout": true,
   "test_fastcards.py::test_request": true,
+  "tests/functional/test_core.py::test_browse_edit": true,
+  "tests/functional/test_core.py::test_browse_edit_preexisting_deck": true,
   "tests/test_fastcards.py::test_home_page": true,
-  "tests/test_fastcards.py::test_request": true
+  "tests/test_fastcards.py::test_request": true,
+  "tests/unit/test_deckmodel.py::test_deckmodel_init": true
 }

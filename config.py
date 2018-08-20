@@ -7,6 +7,8 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 class TestingConfig(BaseConfig):
+    # secret key enables flask.session, which lets flask
+    # remember data from one request to another via a signed cookie.
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'sirius black'
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # suppress annoying msg
     TESTING = True

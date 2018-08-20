@@ -1,5 +1,9 @@
 [
-  "tests/test_fastcards.py::test_login_redirect",
-  "tests/test_fastcards.py::test_login_200",
-  "tests/test_fastcards.py::test_valid_login_logout"
+  "tests/functional/test_core.py::test_browse_edit",
+  "tests/functional/test_core.py::test_browse_edit_preexisting_deck",
+  "tests/functional/test_login_logout.py::test_login_redirect",
+  "tests/functional/test_login_logout.py::test_login_200",
+  "tests/functional/test_login_logout.py::test_valid_login_logout",
+  "tests/unit/test_deckmodel.py::test_deckmodel_init",
+  "tests/unit/test_deckmodel.py::test_deckmodel_add_card"
 ]
