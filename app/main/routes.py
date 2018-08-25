@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, login_required
-from app.models import User
+from app.models import User, Deck, Card
 from app.main import bp
-from app import decksmodel # TODO decksmodel like app needs to be abstracted into a callable context
+from app import decksmodel, db # TODO decksmodel like app needs to be abstracted into a callable context
 from app.forms import LoginForm, BrowseEditForm, DeckForm, CardForm
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
@@ -15,16 +15,18 @@ from wtforms.validators import DataRequired
 def index():
     decks_form = {} # Not actually a Form object. Do not be confused.
     class _DeckForm(DeckForm):
-            pass
-    for deckmodel in decksmodel.getDecks().values():
+        pass
+    decks = Deck.query.all()
+    for deck in decks:
         # Field edits must be made on the class to avoid UnboundField error.
         setattr(_DeckForm, 'browse_edit', SubmitField('Browse/Edit'))
         # deckname as StringField so that it can be submitted:
-        setattr(_DeckForm, 'deckname_field', HiddenField(label='deckname', default=deckmodel.getTablename()))
+        setattr(_DeckForm, 'deckname_field', HiddenField(
+            label='deckname', default=deck.deckname))
         new_deckform = _DeckForm()
         # deckname as str attribute so that it can be printed to the view:
-        setattr(new_deckform, 'deckname', deckmodel.getTablename())
-        decks_form[deckmodel.getTablename()] = new_deckform
+        setattr(new_deckform, 'deckname', deck.deckname)
+        decks_form[deck.deckname] = new_deckform
     
     setattr(_DeckForm, 'browse_edit', SubmitField('Create a New Empty Deck'))
     setattr(_DeckForm, 'deckname_field', HiddenField(label='deckname', default=''))

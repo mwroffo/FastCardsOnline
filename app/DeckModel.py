@@ -8,15 +8,11 @@ class DeckModel:
     """
     encapsulates sqlalchemy methods and represents a 
     connection to a particular `Deck`, which constitutes all rows in
-    cards that share the deck
+    table `card` that share a `deck_id`.
 
     SECURITY CONSIDERATIONS: remember to validate input.
     Reject term and definition inputs that look like SQL commands, html tags, javascript, etc.
     Write a testbench for security specifically.
-
-    db.Model is not extended because the database design
-    demands multiple tables of identical schema.
-    ??? Can model objects be instantiated multiple times with different tables of identical schema? ???
     """
     def __init__(self, tablename, username):
         self._tablename, self._username = tablename, username
