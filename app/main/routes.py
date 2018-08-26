@@ -21,15 +21,14 @@ def index():
         # Field edits must be made on the class to avoid UnboundField error.
         setattr(_DeckForm, 'browse_edit', SubmitField('Browse/Edit'))
         # deckname as StringField so that it can be submitted:
-        setattr(_DeckForm, 'deckname_field', HiddenField(
-            label='deckname', default=deck.deckname))
+        setattr(_DeckForm, 'hidden_deckid_field', HiddenField(default=deck.id))
         new_deckform = _DeckForm()
         # deckname as str attribute so that it can be printed to the view:
         setattr(new_deckform, 'deckname', deck.deckname)
         decks_form[deck.deckname] = new_deckform
     
     setattr(_DeckForm, 'browse_edit', SubmitField('Create a New Empty Deck'))
-    setattr(_DeckForm, 'deckname_field', HiddenField(label='deckname', default=''))
+    setattr(_DeckForm, 'hidden_deckid_field', HiddenField(default=0))
     empty_deckform = _DeckForm()
     return render_template(
         'index.html',
@@ -50,17 +49,19 @@ def browse_edit():
         class _BrowseEditForm(BrowseEditForm):
             pass
 
+        print(request.form)
+
         # set decktitle field to the deck's name:
-        deckname = request.form['deckname_field']
+        deckid = request.form['hidden_deckid_field']
         # TODO new db architecture causes changes in deckmodel/decksmodel,
         # which will cause changes here.
-        deckmodel = decksmodel.getDecks()[deckname]
-        _BrowseEditForm.deckname.default = deckname
+        deck = Deck.query.get(deckid)
+        _BrowseEditForm.deckname.default = deck.deckname
         browse_edit_form = _BrowseEditForm()
         class _CardForm(CardForm):
             pass
         
-        for card in deckmodel.getCards():
+        for card in Card.query.filter_by(deck_id=deckid):
             _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
             _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
             browse_edit_form.cards.append_entry(_CardForm())

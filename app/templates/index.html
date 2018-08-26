@@ -8,7 +8,7 @@
 </h3>
 {% for deckname, deckform in decks_form.items() %}
 <form action="/browse_edit" method="post" novalidate>
-    {{ deckform.deckname_field }}
+    {{ deckform.hidden_deckid_field }}
     <p>
         {{ deckform.deckname }} &nbsp; {{ deckform.review() }} &nbsp; {{ deckform.browse_edit() }}
     </p>
