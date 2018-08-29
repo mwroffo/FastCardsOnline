@@ -1,18 +1,18 @@
 {% extends "base.html" %} 
-{% block content %}
-<h2>{{ form.deckname.label }} {{ form.deckname }} </h2>
+{% block app_content %}
+<h2>{{ form.deckname.label }} {{ form.deckname(size=32) }} </h2>
         <form action="" method="post" novalidate>
 
-            {% for cardform in form.cards %}
+            {% for cardform_formfield in form.cards %}
             <p>
-                {{ cardform.term.label }} {{ cardform.term(size=32) }} 
-                {% for error in cardform.term.errors %}
+                {{ cardform_formfield.term.label }} {{ cardform_formfield.term(size=64) }} 
+                {% for error in cardform_formfield.term.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
             <p>
-                {{ cardform.definition.label }} {{ cardform.definition(size=32) }}
-                {% for error in cardform.definition.errors %}
+                {{ cardform_formfield.definition.label }} {{ cardform_formfield.definition(size=64) }}
+                {% for error in cardform_formfield.definition.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>

@@ -24,12 +24,15 @@ def test_browse_edit(test_client, init_db):
     """
 
     response = test_client.post('/browse_edit',
-        data=dict(deckname_field='Fall Out Boy songs'),
+        data=dict(hidden_deckid_field=1),
         follow_redirects=True)
     assert b'FastCards' in response.data # confirm header rendered
-    assert b'<input type' in response.data # confirm text fields
+    assert b'<input' in response.data # confirm text fields
     assert b'This is side one.' in response.data # confirm default text rendered
-    assert b'Remove' in response.data # confirm remove buttons rendered
+    assert b'Flip me' in response.data
+    # assert b'Save' in response.data # confirm save button
+
+    # assert b'Remove' in response.data # confirm remove buttons rendered
     assert b'Enter a new term' in response.data # confirm entry_row rendered term
     assert b'Enter a new definition' in response.data # confirm entry_row render definition
     # TODO write tests for requests that come from the now-loaded browse_edit page.

@@ -5,7 +5,7 @@ class, which provides a layer of abstraction between
 view functions and SQLAlchemy.
 """
 
-def test_deckmodel_init(test_client, test_db):
+def test_deckmodel_init(test_client, init_db):
     """ GIVEN a `DeckModel` constructor,
     WHEN a deckname is passed to that constructor,
     THEN confirm that that DeckModel exists,

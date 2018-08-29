@@ -49,26 +49,24 @@ def browse_edit():
         class _BrowseEditForm(BrowseEditForm):
             pass
 
-        print(request.form)
+        # print(request.form)
 
         # set decktitle field to the deck's name:
         deckid = request.form['hidden_deckid_field']
-        # TODO new db architecture causes changes in deckmodel/decksmodel,
-        # which will cause changes here.
         deck = Deck.query.get(deckid)
-        _BrowseEditForm.deckname.default = deck.deckname
+        setattr(_BrowseEditForm.deckname, 'default', deck.deckname)
+
         browse_edit_form = _BrowseEditForm()
         class _CardForm(CardForm):
             pass
         
-        for card in Card.query.filter_by(deck_id=deckid):
+        for card in Card.query.filter_by(deck_id=deckid).all():
             _CardForm.term = card.term
             _CardForm.definition = card.definition
             browse_edit_form.cards.append_entry(_CardForm())
-        # for empty decks, `cards` will not render.
+        # for empty decks, `cards` should not render.
     if browse_edit_form.validate_on_submit:
-        return render_template('browse_edit.html', title='Enter a card',  \
-            user={'username': 'mwroffo'}, form=browse_edit_form)
+        return render_template('browse_edit.html', title='Enter a card', form=browse_edit_form)
     return redirect(url_for('browse_edit.html'))
 
 @bp.route('/review', methods=['GET', 'POST'])

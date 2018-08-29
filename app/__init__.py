@@ -1,6 +1,7 @@
 import shutil
 import os
 from flask import Flask, Blueprint
+from flask_bootstrap import Bootstrap
 from config import DevelopmentConfig
 from flask_sqlalchemy import SQLAlchemy, Model
 import sqlalchemy_utils
@@ -16,6 +17,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 login = flask_login.LoginManager()
 login.login_view = 'auth.login' # force users to login before seeing protected pages
+bootstrap = Bootstrap()
 
 # set up CLI:
 @click.command('reset-db')
@@ -40,6 +42,7 @@ def create_app(config_class=DevelopmentConfig):
     db.init_app(app) # configures app's teardown_context and cli
     migrate.init_app(app, db)
     login.init_app(app) # register LoginManager
+    bootstrap.init_app(app)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)

@@ -38,7 +38,7 @@ class BrowseEditForm(FlaskForm):
     with cards displayed as mutable textfields.
     """
     deckname = StringField('Enter a name for this Deck: ', validators=[DataRequired()])
-    cards = FieldList(FormField(CardForm), min_entries=1)
+    cards = FieldList(FormField(CardForm))
     # empty field goes at bottom to invite new card entries.
     entry_row = FormField(CardForm)
     # submit makes the changes in the deck, a table in the database.
