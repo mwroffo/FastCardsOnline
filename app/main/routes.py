@@ -62,8 +62,8 @@ def browse_edit():
             pass
         
         for card in Card.query.filter_by(deck_id=deckid):
-            _CardForm.term = StringField(default=card.term, label='Term', validators=[DataRequired()])
-            _CardForm.definition = StringField(default=card.definition, label='Definition', validators=[DataRequired()])
+            _CardForm.term = card.term
+            _CardForm.definition = card.definition
             browse_edit_form.cards.append_entry(_CardForm())
         # for empty decks, `cards` will not render.
     if browse_edit_form.validate_on_submit:
